@@ -1,0 +1,53 @@
+# render.yaml — Render.com Blueprint
+# Deploys VedaAI backend + frontend as separate Render services.
+# Docs: https://render.com/docs/blueprint-spec
+
+services:
+  # ── Backend (Express + BullMQ Worker) ──────────────────────────────────────
+  - type: web
+    name: veda-ai-backend
+    runtime: node
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    healthCheckPath: /api/v1/health
+    autoDeploy: true
+    envVars:
+      - key:   NODE_ENV
+        value: production
+      - key:   PORT
+        value: 4000
+      - key:   MONGODB_URI
+        sync:  false      # Set in Render dashboard — MongoDB Atlas connection string
+      - key:   REDIS_URL
+        sync:  false      # Set in Render dashboard — Upstash Redis TLS URL
+      - key:   GROQ_API_KEY
+        sync:  false      # Set in Render dashboard — from console.groq.com
+      - key:   LLM_MODEL
+        value: llama-3.1-70b-versatile
+      - key:   FRONTEND_URL
+        sync:  false      # Set after frontend deploys: https://veda-ai-frontend.onrender.com
+      - key:   REDIS_TTL_PAPER
+        value: '3600'
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+
+  # ── Frontend (Next.js) ──────────────────────────────────────────────────────
+  - type: web
+    name: veda-ai-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    autoDeploy: true
+    envVars:
+      - key:   NODE_ENV
+        value: production
+      - key:   NEXT_PUBLIC_API_URL
+        sync:  false      # e.g. https://veda-ai-backend.onrender.com/api/v1
+      - key:   NEXT_PUBLIC_WS_URL
+        sync:  false      # e.g. https://veda-ai-backend.onrender.com
+    scaling:
+      minInstances: 1
+      maxInstances: 2

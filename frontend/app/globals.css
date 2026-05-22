@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --brand:       #E5442D;
+    --brand-light: #FEF3F0;
+    --sidebar-w:   252px;
+  }
+  html {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  * { box-sizing: border-box; }
+}
+
+@layer components {
+  /* Orange filled pill — Create Assignment */
+  .btn-brand {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[#E5442D] px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-[#c73a25] active:scale-95 disabled:opacity-50;
+  }
+  /* Dark pill — primary CTA in main area */
+  .btn-dark {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[#1A1A2E] px-5 py-2.5 text-sm font-semibold text-white transition-all hover:bg-black active:scale-95 disabled:opacity-50;
+  }
+  /* Ghost bordered pill */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-all hover:bg-gray-50 active:scale-95;
+  }
+  /* Input */
+  .input {
+    @apply w-full rounded-xl border border-gray-200 bg-white px-3.5 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-[#E5442D] focus:outline-none focus:ring-2 focus:ring-[#E5442D]/20;
+  }
+  .input-error {
+    @apply border-red-300 bg-red-50;
+  }
+  /* White card */
+  .card {
+    @apply rounded-2xl border border-gray-100 bg-white shadow-sm;
+  }
+  /* Field label */
+  .label {
+    @apply mb-1.5 block text-xs font-semibold text-gray-500;
+  }
+}
+
+/* ── Print ── */
+@media print {
+  .no-print { display: none !important; }
+  body { background: white !important; }
+  @page { margin: 1.5cm; size: A4; }
+}
+
+/* ── Hide Next.js Dev Indicator ── */
+nextjs-portal,
+[data-nextjs-portal],
+[data-next-badge="true"],
+#next-logo,
+[data-nextjs-dev-tools-button],
+[data-next-mark],
+[data-next-mark-loading] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
