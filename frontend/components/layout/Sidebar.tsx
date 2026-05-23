@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -40,9 +41,7 @@ export function Sidebar({ assignmentCount = 0 }: { assignmentCount?: number }) {
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-[252px] flex-col border-r border-gray-100 bg-white">
       <div className="mt-[6px] flex h-16 items-center gap-2 px-5 border-b border-gray-100">
-        <div className="-ml-2 flex h-11 w-11 items-center justify-center rounded-2xl bg-gradient-to-b from-[#F56A43] to-[#C23B22] shadow-[0_10px_20px_rgba(194,59,34,0.28)]">
-          <span className="text-[22px] font-black leading-none text-white">V</span>
-        </div>
+        <Image src="/logo.png" alt="VedaAI" width={52} height={52} className="-ml-2 rounded-2xl" priority />
         <span className="-mt-5 text-[22px] font-black tracking-tight text-gray-900">VedaAI</span>
       </div>
 

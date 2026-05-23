@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -82,9 +83,7 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-[#F56A43] to-[#C23B22] text-[14px] font-black leading-none text-white shadow-[0_8px_18px_rgba(194,59,34,0.22)]">
-              V
-            </div>
+            <Image src="/logo.png" alt="VedaAI" width={40} height={40} className="rounded-lg" priority />
             <span className="text-[18px] font-bold tracking-tight text-gray-900">VedaAI</span>
           </div>
           <button
