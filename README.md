@@ -12,7 +12,7 @@
 
 **A production-ready platform that lets teachers generate complete, structured question papers using Groq AI in seconds — with real-time progress tracking, an AI toolkit, and a full class management system.**
 
-[Live Demo](#) · [API Docs](./docs/API_SPEC.md) · [Architecture](./docs/HLD.md) · [Report a Bug](#)
+[Live Demo](https://veda-ai-gilt.vercel.app) · [API Docs](./docs/API_SPEC.md) · [Architecture](./docs/HLD.md)
 
 </div>
 
