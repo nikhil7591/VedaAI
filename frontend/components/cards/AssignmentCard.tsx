@@ -46,14 +46,26 @@ export function AssignmentCard({
   const cfg  = STATUS_STYLES[a.status] ?? STATUS_STYLES.pending;
   const Icon = cfg.icon;
 
+  const openAssignment = () => {
+    router.push(viewHref);
+  };
+
   return (
-    <div className="card flex flex-col gap-3 p-5 rounded-3xl bg-white shadow-sm border border-gray-100 transition-shadow hover:shadow-md">
+    <div
+      role="button"
+      tabIndex={0}
+      onClick={openAssignment}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openAssignment();
+        }
+      }}
+      className="card flex flex-col gap-3 rounded-3xl border border-gray-100 bg-white p-5 shadow-sm transition-shadow hover:shadow-md"
+    >
       {/* Title row */}
       <div className="flex items-start justify-between gap-2">
-        <div 
-          className="flex-1 cursor-pointer group"
-          onClick={() => router.push(viewHref)}
-        >
+        <div className="group flex-1">
           <h3 className="text-lg font-black tracking-tight leading-snug text-gray-900 group-hover:text-[#E5442D] transition-colors">
             {a.title}
           </h3>
@@ -65,7 +77,10 @@ export function AssignmentCard({
         {/* 3-dot menu */}
         <div className="relative flex-shrink-0" ref={menuRef}>
           <button
-            onClick={() => setOpen((v) => !v)}
+            onClick={(e) => {
+              e.stopPropagation();
+              setOpen((v) => !v);
+            }}
             className="flex h-8 w-8 items-center justify-center rounded-full text-gray-600 hover:bg-gray-100 transition-colors"
           >
             <MoreVertical className="h-5 w-5" />
@@ -74,7 +89,7 @@ export function AssignmentCard({
           {open && (
             <div className="absolute right-0 top-9 z-20 w-44 overflow-hidden rounded-xl border border-gray-100 bg-white shadow-lg">
               <button
-                onClick={() => { setOpen(false); router.push(viewHref); }}
+                onClick={(e) => { e.stopPropagation(); setOpen(false); openAssignment(); }}
                 className="flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50"
               >
                 <Eye className="h-4 w-4 text-gray-400" />
@@ -82,7 +97,7 @@ export function AssignmentCard({
               </button>
               <div className="h-[1px] bg-gray-100 w-full" />
               <button
-                onClick={() => { setOpen(false); onDelete(a._id); }}
+                onClick={(e) => { e.stopPropagation(); setOpen(false); onDelete(a._id); }}
                 className="flex w-full items-center gap-2.5 px-4 py-3 text-sm font-medium text-red-600 hover:bg-red-50"
               >
                 <Trash2 className="h-4 w-4" />
