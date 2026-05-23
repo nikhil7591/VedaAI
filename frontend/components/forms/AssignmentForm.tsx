@@ -1,17 +1,20 @@
 'use client';
 
-import { useState, useCallback, useRef } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  UploadCloud, Plus, Minus, X,
-  ChevronLeft, ChevronRight, Loader2,
+  UploadCloud,
+  Plus,
+  Minus,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Loader2,
   ChevronDown,
 } from 'lucide-react';
 import { useGenerationStore } from '../../stores/generationStore';
 import { AIAPI, AssignmentAPI } from '../../lib/api';
 import { cn } from '../../lib/utils';
-
-/* ─── Types ─────────────────────────────────────────────────────── */
 
 type QRow = { id: string; type: string; questions: number; marks: number };
 
@@ -25,8 +28,6 @@ const Q_TYPES = [
 ];
 
 const uid = () => Math.random().toString(36).slice(2, 9);
-
-/* ─── Step progress bar ─────────────────────────────────────────── */
 
 function StepBar({ step, total }: { step: number; total: number }) {
   return (
@@ -44,40 +45,38 @@ function StepBar({ step, total }: { step: number; total: number }) {
   );
 }
 
-/* ─── +/− Stepper ────────────────────────────────────────────────── */
-
 function Stepper({
-  value, onChange, min = 1, max = 100,
+  value,
+  onChange,
+  min = 1,
+  max = 100,
 }: {
-  value: number; onChange: (v: number) => void; min?: number; max?: number;
+  value: number;
+  onChange: (v: number) => void;
+  min?: number;
+  max?: number;
 }) {
   return (
     <div className="inline-flex items-center gap-4 rounded-full border border-gray-100 bg-white px-3 py-2.5 shadow-sm">
-      <button
-        type="button"
-        onClick={() => onChange(Math.max(min, value - 1))}
-        className="flex h-5 w-5 items-center justify-center text-gray-400 hover:text-gray-900"
-      >
+      <button type="button" onClick={() => onChange(Math.max(min, value - 1))} className="flex h-5 w-5 items-center justify-center text-gray-400 hover:text-gray-900">
         <Minus className="h-4 w-4" strokeWidth={3} />
       </button>
       <span className="w-6 text-center text-[13px] font-bold text-gray-800">{value}</span>
-      <button
-        type="button"
-        onClick={() => onChange(Math.min(max, value + 1))}
-        className="flex h-5 w-5 items-center justify-center text-gray-400 hover:text-gray-900"
-      >
+      <button type="button" onClick={() => onChange(Math.min(max, value + 1))} className="flex h-5 w-5 items-center justify-center text-gray-400 hover:text-gray-900">
         <Plus className="h-4 w-4" strokeWidth={3} />
       </button>
     </div>
   );
 }
 
-/* ─── Type selector dropdown ─────────────────────────────────────── */
-
 function TypeSelect({
-  value, onChange, used,
+  value,
+  onChange,
+  used,
 }: {
-  value: string; onChange: (v: string) => void; used: string[];
+  value: string;
+  onChange: (v: string) => void;
+  used: string[];
 }) {
   return (
     <div className="relative flex-1 w-full">
@@ -97,8 +96,6 @@ function TypeSelect({
   );
 }
 
-/* ─── Main form ──────────────────────────────────────────────────── */
-
 export function AssignmentForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -110,7 +107,6 @@ export function AssignmentForm() {
   const [extracting, setExtracting] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
-  const [file, setFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const [className, setClassName] = useState('');
@@ -121,70 +117,92 @@ export function AssignmentForm() {
     { id: uid(), type: 'Multiple Choice Questions', questions: 4, marks: 4 },
     { id: uid(), type: 'Short Questions', questions: 4, marks: 4 },
   ]);
+  const [fieldErrors, setFieldErrors] = useState<{
+    className?: string;
+    subjectName?: string;
+    dueDate?: string;
+    rows?: string;
+    upload?: string;
+    submit?: string;
+  }>({});
 
   const generatedAssignmentTitle = className.trim() && subjectName.trim()
     ? `${className.trim()} ${subjectName.trim()} Assignment`
     : 'Assignment';
   const assignmentSubject = subjectName.trim() || 'General';
 
-  const totalQ = rows.reduce((s, r) => s + r.questions, 0);
-  const totalM = rows.reduce((s, r) => s + r.questions * r.marks, 0);
-  const used = rows.map((r) => r.type);
+  const totalQ = rows.reduce((sum, row) => sum + row.questions, 0);
+  const totalM = rows.reduce((sum, row) => sum + row.questions * row.marks, 0);
+  const used = rows.map((row) => row.type);
 
   const changeRow = useCallback(
     (id: string, field: keyof QRow, val: string | number) =>
-      setRows((p) => p.map((r) => (r.id === id ? { ...r, [field]: val } : r))),
+      setRows((prev) => prev.map((row) => (row.id === id ? { ...row, [field]: val } : row))),
     []
   );
+
   const addRow = () => {
     const avail = Q_TYPES.find((t) => !used.includes(t));
-    if (avail) setRows((p) => [...p, { id: uid(), type: avail, questions: 4, marks: 4 }]);
+    if (avail) setRows((prev) => [...prev, { id: uid(), type: avail, questions: 4, marks: 4 }]);
   };
-  const removeRow = (id: string) => setRows((p) => p.filter((r) => r.id !== id));
 
-  const handleFile = async (f: File) => {
-    setFileName(f.name);
-    setFile(f);
+  const removeRow = (id: string) => setRows((prev) => prev.filter((row) => row.id !== id));
 
-    if (!f.type.startsWith('image/')) {
-      return;
-    }
+  const handleFile = async (file: File) => {
+    setFileName(file.name);
+    setFieldErrors((current) => ({ ...current, upload: undefined }));
+
+    if (!file.type.startsWith('image/')) return;
 
     setExtracting(true);
     try {
-      const extracted = await AIAPI.extractTextFromImage(f);
+      const extracted = await AIAPI.extractTextFromImage(file);
       if (extracted.text) {
         setAdditionalInfo((current) => (current.trim() ? current : extracted.text));
       }
     } catch (error: any) {
-      alert(error?.message ?? 'Failed to extract text from the uploaded image.');
+      setFieldErrors((current) => ({
+        ...current,
+        upload: error?.message ?? 'Failed to extract text from the uploaded image.',
+      }));
     } finally {
       setExtracting(false);
     }
   };
 
   const validate = () => {
-    if (!dueDate) { alert('Please select a due date.'); return false; }
-    if (!className.trim()) { alert('Please enter the class.'); return false; }
-    if (!subjectName.trim()) { alert('Please enter the subject.'); return false; }
-    const selectedDate = new Date(`${dueDate}T23:59:59.999`);
-    if (Number.isNaN(selectedDate.getTime()) || selectedDate <= new Date()) {
-      alert('Please select a future due date.');
-      return false;
+    const nextErrors: typeof fieldErrors = {};
+
+    if (!className.trim()) nextErrors.className = 'Please enter the class.';
+    if (!subjectName.trim()) nextErrors.subjectName = 'Please enter the subject.';
+
+    if (!dueDate) {
+      nextErrors.dueDate = 'Please select a due date.';
+    } else {
+      const selectedDate = new Date(`${dueDate}T23:59:59.999`);
+      if (Number.isNaN(selectedDate.getTime()) || selectedDate <= new Date()) {
+        nextErrors.dueDate = 'Please select a future due date.';
+      }
     }
-    if (!rows.length) { alert('Add at least one question type.'); return false; }
-    return true;
+
+    if (!rows.length) nextErrors.rows = 'Add at least one question type.';
+
+    setFieldErrors((current) => ({ ...current, ...nextErrors, submit: undefined }));
+    return Object.keys(nextErrors).length === 0;
   };
 
   const submit = async () => {
     if (!validate()) return;
+
     setSubmitting(true);
+    setFieldErrors((current) => ({ ...current, submit: undefined }));
+
     try {
-      const qTypes = [...new Set(rows.map((r) => {
-        if (r.type.includes('Multiple')) return 'MCQ' as const;
-        if (r.type.includes('Short')) return 'SHORT' as const;
-        if (r.type.includes('Long')) return 'LONG' as const;
-        if (r.type.includes('True')) return 'TRUE_FALSE' as const;
+      const qTypes = [...new Set(rows.map((row) => {
+        if (row.type.includes('Multiple')) return 'MCQ' as const;
+        if (row.type.includes('Short')) return 'SHORT' as const;
+        if (row.type.includes('Long')) return 'LONG' as const;
+        if (row.type.includes('True')) return 'TRUE_FALSE' as const;
         return 'SHORT' as const;
       }))];
 
@@ -205,23 +223,22 @@ export function AssignmentForm() {
         additionalInstructions: additionalInfo.trim(),
       };
 
-      if (groupId) {
-        payload.groupId = groupId;
-      }
+      if (groupId) payload.groupId = groupId;
 
       const res = await AssignmentAPI.create(payload);
-
       setIds(res.assignmentId, res.jobId);
       setStatus('queued', 0);
       router.push(`/assignments/${res.assignmentId}/status`);
     } catch (err: any) {
-      alert(err?.message ?? 'Failed to create. Please try again.');
+      setFieldErrors((current) => ({
+        ...current,
+        submit: err?.message ?? 'Failed to create. Please try again.',
+      }));
     } finally {
       setSubmitting(false);
     }
   };
 
-  /* ── Step 0: Assignment Details ────────────────────────────────── */
   const renderStep0 = () => (
     <div className="w-full">
       <div className="mb-5 w-full text-left">
@@ -241,27 +258,35 @@ export function AssignmentForm() {
           <h2 className="text-[22px] font-bold tracking-tight text-[#101828] md:text-[24px]">Assignment Details</h2>
           <p className="mt-1.5 text-sm text-[#98A2B3]">Basic information about your assignment</p>
 
-          {/* Class + Subject */}
           <div className="mt-6 grid gap-4 md:grid-cols-2">
             <div>
               <label className="mb-2 block text-[15px] font-bold text-[#101828]">Class</label>
               <input
                 type="text"
                 value={className}
-                onChange={(e) => setClassName(e.target.value)}
+                onChange={(e) => {
+                  setClassName(e.target.value);
+                  setFieldErrors((current) => ({ ...current, className: undefined }));
+                }}
                 placeholder="e.g. 8th, 9th, 10th"
                 className="w-full rounded-full border border-[#D0D5DD] bg-[#F9FAFB] px-5 py-3.5 text-sm font-medium text-[#101828] outline-none placeholder:text-[#98A2B3] focus:border-[#E5442D] focus:ring-2 focus:ring-[#E5442D]/10"
               />
+              {fieldErrors.className && <p className="mt-2 text-xs font-medium text-red-500">{fieldErrors.className}</p>}
             </div>
+
             <div>
               <label className="mb-2 block text-[15px] font-bold text-[#101828]">Subject</label>
               <input
                 type="text"
                 value={subjectName}
-                onChange={(e) => setSubjectName(e.target.value)}
+                onChange={(e) => {
+                  setSubjectName(e.target.value);
+                  setFieldErrors((current) => ({ ...current, subjectName: undefined }));
+                }}
                 placeholder="e.g. Mathematics, English, Science"
                 className="w-full rounded-full border border-[#D0D5DD] bg-[#F9FAFB] px-5 py-3.5 text-sm font-medium text-[#101828] outline-none placeholder:text-[#98A2B3] focus:border-[#E5442D] focus:ring-2 focus:ring-[#E5442D]/10"
               />
+              {fieldErrors.subjectName && <p className="mt-2 text-xs font-medium text-red-500">{fieldErrors.subjectName}</p>}
             </div>
           </div>
 
@@ -269,11 +294,16 @@ export function AssignmentForm() {
             <span className="font-semibold text-[#101828]">Assignment Name:</span> {generatedAssignmentTitle}
           </div>
 
-          {/* File upload */}
           <div
             onDragOver={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(true); }}
             onDragLeave={() => setDragOver(false)}
-            onDrop={(e) => { e.preventDefault(); e.stopPropagation(); setDragOver(false); const f = e.dataTransfer.files[0]; if (f) void handleFile(f); }}
+            onDrop={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDragOver(false);
+              const file = e.dataTransfer.files[0];
+              if (file) void handleFile(file);
+            }}
             onClick={() => fileInputRef.current?.click()}
             className={cn(
               'mt-6 mb-3 flex cursor-pointer flex-col items-center justify-center rounded-[28px] border border-dashed bg-white px-4 py-10 text-center transition-colors md:px-6',
@@ -295,19 +325,21 @@ export function AssignmentForm() {
               {extracting ? 'Extracting...' : 'Browse Files'}
             </button>
             <input
-              id="file-up"
               ref={fileInputRef}
               type="file"
               className="hidden"
               accept="image/*"
-              onChange={(e) => { const f = e.target.files?.[0]; if (f) void handleFile(f); }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) void handleFile(file);
+              }}
             />
           </div>
+          {fieldErrors.upload && <p className="-mt-1 mb-3 text-sm font-medium text-red-500">{fieldErrors.upload}</p>}
           <p className="mb-8 text-center text-[13px] font-medium leading-relaxed text-[#98A2B3] md:mb-7">
             Upload images of your preferred document/ image
           </p>
 
-          {/* Due Date */}
           <div className="mb-6">
             <label className="mb-2 block text-[15px] font-bold text-[#101828]">Due Date</label>
             <div className="relative">
@@ -315,16 +347,18 @@ export function AssignmentForm() {
                 type="date"
                 className="w-full rounded-full border border-[#D0D5DD] bg-[#F9FAFB] py-3.5 pl-5 pr-5 text-sm font-medium text-[#101828] outline-none placeholder:text-[#98A2B3] focus:border-[#E5442D] focus:ring-2 focus:ring-[#E5442D]/10"
                 value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
+                onChange={(e) => {
+                  setDueDate(e.target.value);
+                  setFieldErrors((current) => ({ ...current, dueDate: undefined }));
+                }}
               />
             </div>
+            {fieldErrors.dueDate && <p className="mt-2 text-xs font-medium text-red-500">{fieldErrors.dueDate}</p>}
           </div>
 
-          {/* Question Type */}
           <div className="mb-6">
             <label className="mb-3 block text-[15px] font-bold text-[#101828]">Question Type</label>
 
-            {/* ── Desktop UI ── */}
             <div className="hidden md:block">
               <div className="mb-3 flex justify-end gap-10 pr-4">
                 <div className="w-[120px] text-center text-[12px] font-bold text-[#344054]">No. of Questions</div>
@@ -339,10 +373,10 @@ export function AssignmentForm() {
                     <button type="button" onClick={() => removeRow(row.id)} className="flex h-8 w-8 items-center justify-center text-[#98A2B3] transition-colors hover:text-[#101828]">
                       <X className="h-4 w-4" />
                     </button>
-                    <div className="w-[120px] flex justify-center">
+                    <div className="flex w-[120px] justify-center">
                       <Stepper value={row.questions} onChange={(v) => changeRow(row.id, 'questions', v)} />
                     </div>
-                    <div className="w-[120px] flex justify-center">
+                    <div className="flex w-[120px] justify-center">
                       <Stepper value={row.marks} onChange={(v) => changeRow(row.id, 'marks', v)} max={50} />
                     </div>
                   </div>
@@ -350,7 +384,6 @@ export function AssignmentForm() {
               </div>
             </div>
 
-            {/* ── Mobile cards ── */}
             <div className="space-y-4 md:hidden">
               {rows.map((row) => (
                 <div key={row.id} className="rounded-[22px] bg-white px-4 py-4 shadow-[0_4px_16px_rgba(15,23,42,0.05)] ring-1 ring-black/5">
@@ -378,7 +411,6 @@ export function AssignmentForm() {
               ))}
             </div>
 
-            {/* Add row button */}
             <button
               type="button"
               onClick={addRow}
@@ -391,7 +423,8 @@ export function AssignmentForm() {
               Add Question Type
             </button>
 
-            {/* Totals */}
+            {fieldErrors.rows && <p className="mt-3 text-xs font-medium text-red-500">{fieldErrors.rows}</p>}
+
             <div className="mt-5 flex flex-col items-end gap-1 text-[13px] text-[#101828]">
               <div>
                 Total Questions : <span className="font-bold">{totalQ}</span>
@@ -402,7 +435,6 @@ export function AssignmentForm() {
             </div>
           </div>
 
-          {/* Additional info */}
           <div className="mb-6 relative">
             <label className="mb-3 block text-[15px] font-bold text-[#101828]">Additional Information (For better output)</label>
             <textarea
@@ -420,7 +452,8 @@ export function AssignmentForm() {
             </button>
           </div>
 
-          {/* Navigation */}
+          {fieldErrors.submit && <p className="mb-4 text-sm font-medium text-red-500">{fieldErrors.submit}</p>}
+
           <div className="mt-8 flex items-center justify-between gap-4">
             <button
               type="button"
@@ -433,10 +466,7 @@ export function AssignmentForm() {
             <button
               type="button"
               onClick={() => {
-                if (!dueDate) {
-                  alert('Please select a due date.');
-                  return;
-                }
+                if (!validate()) return;
                 setStep(1);
               }}
               className="flex items-center gap-2 rounded-full bg-[#101828] px-6 py-3 text-sm font-semibold text-white shadow-[0_6px_18px_rgba(16,24,40,0.18)] transition-transform hover:scale-105 active:scale-95"
@@ -450,13 +480,10 @@ export function AssignmentForm() {
     </div>
   );
 
-  /* ── Step 1: Review ─────────────────────────────────────────────── */
   const renderStep1 = () => (
     <div className="card p-5 md:p-7">
       <h2 className="text-base font-bold text-gray-900">Review & Generate</h2>
-      <p className="mb-5 mt-0.5 text-xs text-gray-400">
-        Confirm your paper configuration before generating
-      </p>
+      <p className="mb-5 mt-0.5 text-xs text-gray-400">Confirm your paper configuration before generating</p>
 
       <div className="space-y-3">
         {[
@@ -473,13 +500,11 @@ export function AssignmentForm() {
         ))}
 
         <div className="rounded-xl bg-gray-50 px-4 py-3">
-          <p className="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wide">Question Types</p>
-          {rows.map((r) => (
-            <div key={r.id} className="flex items-center justify-between py-0.5 text-sm">
-              <span className="text-gray-700">{r.type}</span>
-              <span className="font-semibold text-gray-800">
-                {r.questions}Q × {r.marks} mk
-              </span>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-500">Question Types</p>
+          {rows.map((row) => (
+            <div key={row.id} className="flex items-center justify-between py-0.5 text-sm">
+              <span className="text-gray-700">{row.type}</span>
+              <span className="font-semibold text-gray-800">{row.questions}Q × {row.marks} mk</span>
             </div>
           ))}
         </div>
@@ -496,24 +521,12 @@ export function AssignmentForm() {
         <button type="button" onClick={() => setStep(0)} className="btn-ghost">
           <ChevronLeft className="h-4 w-4" /> Previous
         </button>
-        <button
-          type="button"
-          onClick={submit}
-          disabled={submitting}
-          className="btn-dark rounded-full px-6 py-2.5"
-        >
-          {submitting
-            ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating...</>
-            : <>Generate Paper <ChevronRight className="h-4 w-4" /></>
-          }
+        <button type="button" onClick={submit} disabled={submitting} className="btn-dark rounded-full px-6 py-2.5">
+          {submitting ? <><Loader2 className="h-4 w-4 animate-spin" /> Generating...</> : <>Generate Paper <ChevronRight className="h-4 w-4" /></>}
         </button>
       </div>
     </div>
   );
 
-  return (
-    <div>
-      {step === 0 ? renderStep0() : renderStep1()}
-    </div>
-  );
+  return <div>{step === 0 ? renderStep0() : renderStep1()}</div>;
 }

@@ -1,14 +1,13 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   LayoutGrid, Users, BookOpen, Sparkles,
-  Library, Settings, Plus, MapPin,
+  Library, Settings,
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { SchoolProfileModal } from '../modals/SchoolProfileModal';
 import { ProfileAPI } from '../../lib/api';
 
@@ -31,12 +30,6 @@ export function Sidebar({ assignmentCount = 0 }: { assignmentCount?: number }) {
       if (p) setProfile({ name: p.name, address: p.address });
     }).catch(console.error);
   };
-
-  useEffect(() => {
-    ProfileAPI.get().then(p => {
-      if (p) setProfile({ name: p.name, address: p.address });
-    }).catch(console.error);
-  }, []);
 
   const active = (href: string) => {
     if (href === '/') return path === '/';
@@ -115,16 +108,8 @@ export function Sidebar({ assignmentCount = 0 }: { assignmentCount?: number }) {
           onClick={() => setIsProfileOpen(true)}
           className="flex w-full items-center gap-3 rounded-[20px] bg-[#F4F4F5] p-2.5 text-left transition-all hover:bg-gray-200 active:scale-95"
         >
-          <div className="h-[42px] w-[42px] flex-shrink-0 overflow-hidden rounded-full bg-[#FCE5D8]">
-            {/* School initials logo using Dicebear */}
-            <Image 
-              src="https://api.dicebear.com/7.x/initials/svg?seed=DPS&backgroundColor=E5442D&textColor=ffffff" 
-              alt="DPS" 
-              width={42} 
-              height={42} 
-              className="h-full w-full object-cover" 
-              unoptimized
-            />
+          <div className="flex h-[42px] w-[42px] flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-[#E5442D] to-[#C53922] text-[13px] font-black text-white shadow-[0_8px_18px_rgba(229,68,45,0.24)]">
+            DPS
           </div>
           <div className="min-w-0 flex-1">
             <p className="truncate text-[15px] font-bold tracking-tight text-gray-900 leading-tight">{profile?.name || 'Delhi Public School'}</p>

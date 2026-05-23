@@ -1,7 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
@@ -83,7 +82,9 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-5 border-b border-gray-100">
           <div className="flex items-center gap-2.5">
-            <Image src="/logo.png" alt="VedaAI" width={32} height={32} className="rounded-lg" />
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-b from-[#F56A43] to-[#C23B22] text-[14px] font-black leading-none text-white shadow-[0_8px_18px_rgba(194,59,34,0.22)]">
+              V
+            </div>
             <span className="text-[18px] font-bold tracking-tight text-gray-900">VedaAI</span>
           </div>
           <button
@@ -138,15 +139,8 @@ export function MobileDrawer({ isOpen, onClose }: MobileDrawerProps) {
         <div className="mt-auto border-t border-gray-100 px-4 py-4 space-y-3">
           {/* School Card */}
           <div className="flex items-center gap-3 rounded-2xl bg-[#F4F4F5] p-3">
-            <div className="h-10 w-10 flex-shrink-0 overflow-hidden rounded-full bg-[#FCE5D8]">
-              <Image
-                src="https://api.dicebear.com/7.x/initials/svg?seed=DPS&backgroundColor=E5442D&textColor=ffffff"
-                alt="School"
-                width={40}
-                height={40}
-                className="h-full w-full object-cover"
-                unoptimized
-              />
+            <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-gradient-to-b from-[#E5442D] to-[#C53922] text-[12px] font-black text-white shadow-[0_8px_18px_rgba(229,68,45,0.24)]">
+              DPS
             </div>
             <div className="min-w-0 flex-1">
               <p className="truncate text-[14px] font-bold text-gray-900 leading-tight">
