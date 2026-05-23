@@ -2,21 +2,78 @@
 
 import { AppShell } from '../../components/layout/AppShell';
 import { User, Mail, Phone, Shield, Camera } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { ProfileAPI } from '../../lib/api';
 
 export default function ProfilePage() {
   const [isEditing, setIsEditing] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
   const [profile, setProfile] = useState({
-    firstName: 'John',
-    lastName: 'Doe',
-    email: 'john.doe@example.com',
+    firstName: '',
+    lastName: '',
+    address: '',
+    email: '',
     phone: '+91 98765 43210',
     role: 'Senior Teacher',
     bio: 'Passionate educator with 10+ years of experience in making learning fun and engaging.',
   });
 
-  const handleSave = () => {
-    setIsEditing(false);
+  const fullName = useMemo(
+    () => [profile.firstName, profile.lastName].filter(Boolean).join(' ').trim(),
+    [profile.firstName, profile.lastName]
+  );
+
+  const initials = useMemo(() => {
+    return (fullName || 'John Doe')
+      .split(' ')
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('') || 'JD';
+  }, [fullName]);
+
+  useEffect(() => {
+    ProfileAPI.get()
+      .then((p) => {
+        const nameParts = (p?.name ?? '').trim().split(/\s+/).filter(Boolean);
+        const firstName = nameParts[0] ?? '';
+        const lastName = nameParts.slice(1).join(' ');
+        setProfile((prev) => ({
+          ...prev,
+          firstName,
+          lastName,
+          email: p?.email ?? '',
+          phone: p?.phone ?? '',
+          address: p?.address ?? '',
+        }));
+      })
+      .catch(() => setError('Failed to load profile'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleSave = async () => {
+    if (!fullName) {
+      setError('First name is required');
+      return;
+    }
+
+    setSaving(true);
+    setError('');
+    try {
+      await ProfileAPI.update({
+        name: fullName,
+        email: profile.email,
+        phone: profile.phone,
+        address: profile.address,
+      });
+      setIsEditing(false);
+    } catch {
+      setError('Failed to save profile changes');
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -27,19 +84,25 @@ export default function ProfilePage() {
           <p className="mt-1 text-sm text-gray-500">Manage your personal information and preferences</p>
         </div>
 
+        {error && (
+          <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+            {error}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Left Column - Avatar & Quick Info */}
           <div className="md:col-span-1 space-y-6">
             <div className="card p-6 text-center">
               <div className="relative mx-auto mb-4 h-24 w-24 rounded-full bg-gray-100 flex items-center justify-center border-4 border-white shadow-sm overflow-hidden">
-                <span className="text-3xl font-bold text-gray-400">JD</span>
+                <span className="text-3xl font-bold text-gray-400">{initials}</span>
                 {isEditing && (
                   <button className="absolute inset-0 bg-black/40 flex items-center justify-center text-white backdrop-blur-[2px] transition-colors hover:bg-black/50">
                     <Camera className="h-6 w-6" />
                   </button>
                 )}
               </div>
-              <h2 className="text-xl font-bold text-gray-900">{profile.firstName} {profile.lastName}</h2>
+              <h2 className="text-xl font-bold text-gray-900">{fullName || 'John Doe'}</h2>
               <p className="text-sm font-medium text-[#E5442D] mt-1">{profile.role}</p>
             </div>
 
@@ -121,6 +184,16 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
+                  <label className="label">Address</label>
+                  <textarea
+                    className="input min-h-[90px] resize-none py-3"
+                    value={profile.address}
+                    disabled={!isEditing}
+                    onChange={(e) => setProfile({ ...profile, address: e.target.value })}
+                  />
+                </div>
+
+                <div>
                   <label className="label">Bio</label>
                   <textarea 
                     className="input min-h-[100px] resize-none py-3" 
@@ -133,7 +206,9 @@ export default function ProfilePage() {
                 {isEditing && (
                   <div className="flex justify-end gap-3 pt-4 border-t border-gray-100 mt-6">
                     <button onClick={() => setIsEditing(false)} className="btn-ghost px-5 py-2.5">Cancel</button>
-                    <button onClick={handleSave} className="btn-brand px-6 py-2.5">Save Changes</button>
+                    <button onClick={handleSave} disabled={saving || loading} className="btn-brand px-6 py-2.5 disabled:cursor-not-allowed disabled:opacity-70">
+                      {saving ? 'Saving...' : 'Save Changes'}
+                    </button>
                   </div>
                 )}
               </div>

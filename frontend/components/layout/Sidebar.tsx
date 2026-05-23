@@ -40,10 +40,10 @@ export function Sidebar({ assignmentCount = 0 }: { assignmentCount?: number }) {
 
   return (
     <aside className="fixed inset-y-0 left-0 z-40 flex w-[252px] flex-col border-r border-gray-100 bg-white">
-      <div className="mt-[6px] flex h-16 items-center gap-2 px-5 border-b border-gray-100">
-        <Image src="/logo.png" alt="VedaAI" width={52} height={52} className="-ml-2 rounded-2xl" priority />
-        <span className="-mt-5 text-[22px] font-black tracking-tight text-gray-900">VedaAI</span>
-      </div>
+      <Link href="/" aria-label="Go to home" className="mt-[14px] flex h-14 items-center gap-2 border-b border-gray-100 px-5">
+        <Image src="/logo.png" alt="VedaAI" width={69} height={52} className="-ml-4 rounded-2xl" priority />
+        <span className="-ml-4 -mt-5 text-[22px] font-black tracking-tight text-gray-900">VedaAI</span>
+      </Link>
 
       {/* ── Create Assignment ── */}
       <div className="px-4 py-5">

@@ -288,8 +288,11 @@ export const ProfileAPI = {
   },
   update: async (data: any) => {
     const res = await api.put('/profile', data);
-    // Invalidate cache after update
-    _profileCache = null;
+    // Keep cache hot with latest profile and notify UI listeners.
+    _profileCache = { data: res.data.data, ts: Date.now() };
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('profile:updated', { detail: res.data.data }));
+    }
     return res.data.data;
   },
   invalidateCache: () => { _profileCache = null; },

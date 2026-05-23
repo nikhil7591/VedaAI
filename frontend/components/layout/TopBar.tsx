@@ -8,6 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import NotificationDropdown from './NotificationDropdown';
 import ProfileDropdown from './ProfileDropdown';
 import { MobileDrawer } from './MobileDrawer';
+import { ProfileAPI } from '../../lib/api';
 
 const LABELS: Record<string, string> = {
   '/':             'Home',
@@ -47,7 +48,15 @@ export function TopBar() {
   const canGoBack = path !== '/';
   const [profileOpen, setProfileOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [profileName, setProfileName] = useState('John Doe');
   const profileRef = useRef<HTMLDivElement | null>(null);
+
+  const initials = profileName
+    .split(' ')
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0]?.toUpperCase() ?? '')
+    .join('') || 'JD';
 
   useEffect(() => {
     function onDoc(e: MouseEvent) {
@@ -64,6 +73,26 @@ export function TopBar() {
     return () => {
       document.removeEventListener('click', onDoc);
       document.removeEventListener('keydown', onKey);
+    };
+  }, []);
+
+  useEffect(() => {
+    let mounted = true;
+    ProfileAPI.get()
+      .then((p) => {
+        if (mounted && p?.name) setProfileName(p.name);
+      })
+      .catch(() => {});
+
+    const onProfileUpdated = (e: Event) => {
+      const custom = e as CustomEvent<{ name?: string }>;
+      if (custom.detail?.name) setProfileName(custom.detail.name);
+    };
+
+    window.addEventListener('profile:updated', onProfileUpdated as EventListener);
+    return () => {
+      mounted = false;
+      window.removeEventListener('profile:updated', onProfileUpdated as EventListener);
     };
   }, []);
 
@@ -90,8 +119,8 @@ export function TopBar() {
 
         {/* Mobile Left: Logo (hidden on desktop) */}
         <Link href="/" className="flex items-center gap-2.5 md:hidden">
-          <Image src="/logo.png" alt="VedaAI" width={34} height={34} className="rounded-[10px]" />
-          <span className="text-[20px] font-bold tracking-tight text-[#1A1A1A]">VedaAI</span>
+          <Image src="/logo.png" alt="VedaAI" width={50} height={54} className="mt-[22px] h-[57px] w-[52px] rounded-[10px] object-cover" />
+          <span className="-ml-[14px] -mt-[4px] text-[20px] font-bold tracking-tight text-[#1A1A1A]">VedaAI</span>
         </Link>
 
         {/* Right: notifications + user + hamburger */}
@@ -100,8 +129,8 @@ export function TopBar() {
 
           {/* Mobile Profile & Hamburger */}
           <div className="flex items-center gap-3.5 md:hidden">
-            <div className="h-9 w-9 overflow-hidden rounded-full bg-gray-200 ring-2 ring-gray-100">
-               <img src="https://i.pravatar.cc/100?img=11" alt="Profile" className="h-full w-full object-cover" />
+            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E2E8F0] text-[12px] font-bold text-[#0A2540] ring-2 ring-gray-100">
+              {initials}
             </div>
             <button
               onClick={() => setDrawerOpen(true)}
@@ -121,9 +150,9 @@ export function TopBar() {
               className="flex items-center gap-1.5 rounded-full border border-gray-200 py-1 pl-1 pr-2 hover:bg-gray-50 transition-colors shadow-sm bg-white"
             >
               <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#E2E8F0] text-[11px] font-bold text-[#0A2540] flex-shrink-0">
-                JD
+                {initials}
               </div>
-              <span className="hidden text-xs font-semibold text-gray-700 sm:block">John Doe</span>
+              <span className="hidden text-xs font-semibold text-gray-700 sm:block">{profileName}</span>
               <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
             </button>
             {profileOpen && <ProfileDropdown onLogout={() => {}} />}

@@ -5,12 +5,84 @@ import { AppShell } from '../../components/layout/AppShell';
 import { FileText, CheckSquare, Star, BarChart2, PenTool, Zap, ArrowRight } from 'lucide-react';
 
 const TOOLS = [
-  { icon: FileText,    color: '#E5442D', bg: '#FEF3F0', title: 'Question Paper Generator', desc: 'Generate structured question papers for any subject using Groq AI', href: '/create', tag: 'Popular' },
-  { icon: CheckSquare, color: '#3B82F6', bg: '#EFF6FF', title: 'Auto Grader',               desc: 'Upload student submissions and let AI grade them automatically',    href: '/toolkit/auto-grader',       tag: 'New' },
-  { icon: Star,        color: '#8B5CF6', bg: '#F5F3FF', title: 'Rubric Builder',             desc: 'Create detailed marking rubrics for fair and consistent grading',   href: '/toolkit/rubric-builder',       tag: 'New' },
-  { icon: BarChart2,   color: '#10B981', bg: '#ECFDF5', title: 'Analytics Dashboard',        desc: 'Track student performance trends across assignments and subjects',   href: '/toolkit/analytics',       tag: 'New' },
-  { icon: PenTool,     color: '#F59E0B', bg: '#FFFBEB', title: 'Feedback Generator',         desc: 'Generate personalised AI feedback for each student response',        href: '/toolkit/feedback-generator',       tag: 'New' },
-  { icon: Zap,         color: '#EC4899', bg: '#FDF2F8', title: 'Quick Quiz Creator',         desc: 'Build quick 5-question formative assessments in under 30 seconds',  href: '/toolkit/quick-quiz',       tag: 'Beta' },
+  {
+    icon: FileText,
+    color: '#E5442D',
+    bg: '#FEF3F0',
+    title: 'Question Paper Generator',
+    href: '/create',
+    tag: 'Popular',
+    details: [
+      'What: AI tool to create class-wise and subject-wise question papers.',
+      'Does: Builds sections, marks distribution, and balanced question types.',
+      'How to use: Open the tool, fill class/subject + pattern, then generate and review.',
+    ],
+  },
+  {
+    icon: CheckSquare,
+    color: '#3B82F6',
+    bg: '#EFF6FF',
+    title: 'Auto Grader',
+    href: '/toolkit/auto-grader',
+    tag: 'New',
+    details: [
+      'What: Smart evaluator for student answers.',
+      'Does: Scores responses, gives grade %, and highlights strengths/improvements.',
+      'How to use: Paste question + answer key + student response, set marks, click Grade.',
+    ],
+  },
+  {
+    icon: Star,
+    color: '#8B5CF6',
+    bg: '#F5F3FF',
+    title: 'Rubric Builder',
+    href: '/toolkit/rubric-builder',
+    tag: 'New',
+    details: [
+      'What: Rubric designer for consistent marking.',
+      'Does: Creates criteria levels and mark bands for fair evaluation.',
+      'How to use: Choose assessment type, add criteria, set weights, then save rubric.',
+    ],
+  },
+  {
+    icon: BarChart2,
+    color: '#10B981',
+    bg: '#ECFDF5',
+    title: 'Analytics Dashboard',
+    href: '/toolkit/analytics',
+    tag: 'New',
+    details: [
+      'What: Performance insights panel for classes and assignments.',
+      'Does: Shows trends, weak topics, average scores, and progress patterns.',
+      'How to use: Select class/date range, compare metrics, and act on low-performing areas.',
+    ],
+  },
+  {
+    icon: PenTool,
+    color: '#F59E0B',
+    bg: '#FFFBEB',
+    title: 'Feedback Generator',
+    href: '/toolkit/feedback-generator',
+    tag: 'New',
+    details: [
+      'What: AI assistant to draft student-specific feedback.',
+      'Does: Produces clear, actionable comments based on response quality.',
+      'How to use: Add student answer/context, choose tone, generate and personalize before sending.',
+    ],
+  },
+  {
+    icon: Zap,
+    color: '#EC4899',
+    bg: '#FDF2F8',
+    title: 'Quick Quiz Creator',
+    href: '/toolkit/quick-quiz',
+    tag: 'Beta',
+    details: [
+      'What: Fast quiz maker for revision and formative checks.',
+      'Does: Creates short, topic-focused questions with ready-to-use format.',
+      'How to use: Enter topic + difficulty + count, generate quiz, edit, and share instantly.',
+    ],
+  },
 ];
 
 export default function ToolkitPage() {
@@ -43,7 +115,18 @@ export default function ToolkitPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="font-bold text-gray-900">{t.title}</h3>
-                  <p className="mt-1 text-xs leading-relaxed text-gray-500">{t.desc}</p>
+                  <ul className="mt-2 space-y-1.5 text-xs leading-relaxed text-gray-500">
+                    {t.details.map((line) => (
+                      <li key={line}>
+                        <span className="mr-1 inline-flex rounded-md bg-gray-100 px-1.5 py-0.5 text-[11px] font-semibold text-gray-700">
+                          {line.split(':')[0]}
+                        </span>
+                        <span className="text-[12px] text-gray-600">
+                          {line.split(':').slice(1).join(':').trim()}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
                 <div className="flex items-center gap-1 text-xs font-semibold" style={{ color: clickable ? t.color : '#9CA3AF' }}>
                   {clickable ? 'Launch tool' : 'Coming soon'}

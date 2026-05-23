@@ -46,10 +46,10 @@ export default function NotificationDropdown() {
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-80 rounded-2xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 z-50 overflow-hidden">
+        <div className="fixed left-2 right-2 top-[76px] z-[80] rounded-2xl bg-white shadow-2xl ring-1 ring-black ring-opacity-5 overflow-hidden md:absolute md:left-auto md:right-0 md:top-auto md:mt-2 md:w-80">
           <div className="p-2">
             <h4 className="px-2 py-1 text-sm font-semibold">Notifications</h4>
-            <div className="max-h-48 overflow-auto">
+            <div className="max-h-[60vh] overflow-auto md:max-h-48">
               {items.map((it) => (
                 <div
                   key={it.id}

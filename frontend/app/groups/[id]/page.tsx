@@ -196,7 +196,7 @@ export default function GroupDetailsPage(props: { params: Promise<{ id: string }
                 <p className="text-sm text-gray-400 mt-1">Add students to start tracking their performance.</p>
               </div>
             ) : (
-              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-visible">
                 <div className="grid grid-cols-12 gap-4 border-b border-gray-50 bg-gray-50/50 p-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                   <div className="col-span-5 md:col-span-4">Student Name</div>
                   <div className="col-span-4 md:col-span-3">Roll No</div>

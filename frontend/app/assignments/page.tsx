@@ -135,8 +135,17 @@ export default function AssignmentsPage() {
             </div>
           )}
 
-          {/* Floating Action Button (Center Bottom) */}
-          <div className="fixed bottom-6 left-0 right-0 md:left-[252px] flex justify-center z-40 pointer-events-none">
+          {/* Mobile FAB */}
+          <Link
+            href="/create"
+            aria-label="Create assignment"
+            className="fixed bottom-[90px] right-5 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#E5442D] shadow-[0_4px_20px_rgba(0,0,0,0.15)] transition-transform active:scale-95 md:hidden"
+          >
+            <Plus className="h-7 w-7" strokeWidth={3} />
+          </Link>
+
+          {/* Desktop Create Button */}
+          <div className="fixed bottom-6 left-0 right-0 md:left-[252px] hidden justify-center z-40 pointer-events-none md:flex">
             <Link
               href="/create"
               className="flex items-center gap-2 rounded-full bg-[#1A1A1A] px-6 py-3.5 text-sm font-bold text-white shadow-lg pointer-events-auto transition-transform hover:scale-[1.02] active:scale-95"
