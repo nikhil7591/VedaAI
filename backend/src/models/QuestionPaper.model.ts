@@ -22,6 +22,7 @@ export interface IQuestionPaper extends Document {
   _id: Types.ObjectId;
   assignmentId: Types.ObjectId;
   title: string;
+  className: string;
   subject: string;
   dueDate?: Date;
   totalMarks: number;
@@ -65,6 +66,7 @@ const QuestionPaperSchema = new Schema<IQuestionPaper>(
   {
     assignmentId: { type: Schema.Types.ObjectId, ref: 'Assignment', required: true },
     title:        { type: String },
+    className:    { type: String },
     subject:      { type: String },
     dueDate:      { type: Date },
     totalMarks:   { type: Number },

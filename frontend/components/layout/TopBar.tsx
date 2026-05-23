@@ -20,7 +20,7 @@ const LABELS: Record<string, string> = {
 };
 
 function getHeaderIcon(path: string) {
-  if (path.startsWith('/assignments')) return ClipboardList;
+  if (path.startsWith('/assignments')) return LayoutGrid;
   if (path.includes('/paper') || path.includes('/status')) return BookOpen;
   if (path.startsWith('/groups')) return Users;
   if (path.startsWith('/library')) return BookOpen;

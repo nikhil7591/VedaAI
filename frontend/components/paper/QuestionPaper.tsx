@@ -2,9 +2,12 @@ import { QuestionPaper as IQP } from '../../types';
 import { SectionBlock } from './SectionBlock';
 import { formatDate } from '../../lib/utils';
 
-interface Props { paper: IQP }
+interface Props { 
+  paper: IQP;
+  profileName?: string;
+}
 
-export function QuestionPaper({ paper }: Props) {
+export function QuestionPaper({ paper, profileName }: Props) {
   let qNum = 1;
   const totalQ = paper.sections.reduce((s, sec) => s + sec.questions.length, 0);
 
@@ -14,37 +17,38 @@ export function QuestionPaper({ paper }: Props) {
   );
 
   return (
-    <div className="mx-auto max-w-3xl bg-white shadow-sm print:shadow-none print:max-w-none">
+    <div className="mx-auto max-w-3xl bg-white rounded-[32px] shadow-sm print:shadow-none print:max-w-none">
 
       {/* ── School / Institution Header ── */}
-      <div className="border-b-2 border-gray-800 px-10 py-8 text-center">
-        <h1 className="text-xl font-extrabold uppercase tracking-wide text-gray-900">
-          {paper.title}
+      <div className="px-10 pt-12 pb-6 text-center">
+        <h1 className="text-2xl font-bold tracking-tight text-gray-900 mb-2">
+          {profileName || 'Delhi Public School'}
         </h1>
-        <div className="mt-3 flex flex-wrap items-center justify-center gap-6 text-sm text-gray-700">
-          <span><strong>Subject:</strong> {paper.subject}</span>
-          {paper.dueDate && <span><strong>Date:</strong> {formatDate(paper.dueDate)}</span>}
-          <span><strong>Maximum Marks:</strong> {paper.totalMarks}</span>
+        <h2 className="text-lg font-semibold text-gray-800 mb-1">
+          Subject: {paper.subject}
+        </h2>
+        <h3 className="text-lg font-semibold text-gray-800 mb-8">
+          Class: {paper.className || '5th'}
+        </h3>
+        
+        <div className="flex justify-between items-center text-sm font-semibold text-gray-800 mb-6">
+          <span>Time Allowed: 45 minutes</span>
+          <span>Maximum Marks: {paper.totalMarks}</span>
+        </div>
+
+        <div className="text-left text-sm font-semibold text-gray-800 mb-6">
+          All questions are compulsory unless stated otherwise.
+        </div>
+
+        {/* ── Student Info ── */}
+        <div className="text-left space-y-2 text-sm font-semibold text-gray-800 border-b-2 border-transparent pb-4">
+          <div>Name: ____________________</div>
+          <div>Roll Number: ____________________</div>
+          <div>Class: {paper.className || '5th'} Section: ____________________</div>
         </div>
       </div>
 
-      <div className="px-10 py-6">
-
-        {/* ── Student Info ── */}
-        <div className="mb-4 grid grid-cols-3 gap-6 border-b border-gray-200 pb-4">
-          {['Name', 'Roll Number', 'Class / Section'].map((lbl) => (
-            <div key={lbl}>
-              <p className="text-xs font-semibold text-gray-500">{lbl}:</p>
-              <div className="mt-2 h-px w-full bg-gray-400" />
-            </div>
-          ))}
-        </div>
-
-        {/* ── Instructions ── */}
-        <div className="mb-6 rounded-lg border border-gray-100 bg-gray-50 px-5 py-3 text-xs text-gray-600">
-          <strong>Instructions:</strong> All questions are compulsory unless stated otherwise.
-          Marks for each question are indicated in brackets.
-        </div>
+      <div className="px-10 pb-10">
 
         {/* ── Sections ── */}
         <div className="space-y-8">
@@ -56,13 +60,13 @@ export function QuestionPaper({ paper }: Props) {
         </div>
 
         {/* ── End of Question Paper ── */}
-        <div className="my-6 text-center text-sm font-semibold text-gray-500 italic">
-          — End of Question Paper —
+        <div className="my-8 text-sm font-bold text-gray-900">
+          End of Question Paper
         </div>
 
         {/* ── Answer Key ── */}
         {allQA.length > 0 && (
-          <div className="mt-4 border-t-2 border-dashed border-gray-300 pt-6">
+          <div className="mt-8 pt-6">
             <h2 className="mb-4 text-base font-bold text-gray-900">Answer Key:</h2>
             <div className="space-y-3">
               {paper.sections.flatMap((sec, si) =>

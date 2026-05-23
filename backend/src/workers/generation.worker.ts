@@ -90,6 +90,7 @@ export function startGenerationWorker(): Worker<GenerationJobData> {
         const paper = await PaperService.create({
           assignmentId,
           title:      parsed.title,
+          className:  assignment.className,
           subject:    assignment.subject,
           dueDate:    assignment.dueDate,
           totalMarks,

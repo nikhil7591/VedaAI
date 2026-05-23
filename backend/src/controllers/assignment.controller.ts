@@ -9,11 +9,17 @@ import { logger } from '../utils/logger';
 
 export const createAssignmentSchema = z.object({
   title:          z.string().min(3, 'Title must be at least 3 characters').trim(),
+  className:      z.string().min(1, 'Class is required').trim(),
   subject:        z.string().min(2, 'Subject must be at least 2 characters').trim(),
   dueDate:        z.string().refine((d) => new Date(d) > new Date(), 'Due date must be in the future'),
   totalMarks:     z.number().int().positive().max(500),
   totalQuestions: z.number().int().min(1).max(100),
   questionTypes:  z.array(z.enum(['MCQ', 'SHORT', 'LONG', 'TRUE_FALSE'])).min(1),
+  questionPlan:   z.array(z.object({
+    type: z.string().min(1),
+    questions: z.number().int().min(1),
+    marks: z.number().int().min(1),
+  })).min(1),
   difficultyDistribution: z
     .object({
       easy:   z.number().min(0).max(100),

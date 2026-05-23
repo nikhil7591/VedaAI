@@ -15,11 +15,13 @@ export interface DifficultyDistribution {
 
 export interface AssignmentFormData {
   title:                  string;
+  className:              string;
   subject:                string;
   dueDate:                string;
   totalMarks:             number;
   totalQuestions:         number;
   questionTypes:          QuestionType[];
+  questionPlan:           { type: string; questions: number; marks: number }[];
   difficultyDistribution: DifficultyDistribution;
   additionalInstructions: string;
 }
@@ -65,6 +67,7 @@ export interface QuestionPaper {
   _id:          string;
   assignmentId: string;
   title:        string;
+  className?:   string;
   subject:      string;
   dueDate?:     string;
   totalMarks:   number;

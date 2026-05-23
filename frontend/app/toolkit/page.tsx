@@ -6,11 +6,11 @@ import { FileText, CheckSquare, Star, BarChart2, PenTool, Zap, ArrowRight } from
 
 const TOOLS = [
   { icon: FileText,    color: '#E5442D', bg: '#FEF3F0', title: 'Question Paper Generator', desc: 'Generate structured question papers for any subject using Groq AI', href: '/create', tag: 'Popular' },
-  { icon: CheckSquare, color: '#3B82F6', bg: '#EFF6FF', title: 'Auto Grader',               desc: 'Upload student submissions and let AI grade them automatically',    href: '#',       tag: 'Coming Soon' },
-  { icon: Star,        color: '#8B5CF6', bg: '#F5F3FF', title: 'Rubric Builder',             desc: 'Create detailed marking rubrics for fair and consistent grading',   href: '#',       tag: 'Coming Soon' },
-  { icon: BarChart2,   color: '#10B981', bg: '#ECFDF5', title: 'Analytics Dashboard',        desc: 'Track student performance trends across assignments and subjects',   href: '#',       tag: 'Coming Soon' },
-  { icon: PenTool,     color: '#F59E0B', bg: '#FFFBEB', title: 'Feedback Generator',         desc: 'Generate personalised AI feedback for each student response',        href: '#',       tag: 'Coming Soon' },
-  { icon: Zap,         color: '#EC4899', bg: '#FDF2F8', title: 'Quick Quiz Creator',         desc: 'Build quick 5-question formative assessments in under 30 seconds',  href: '#',       tag: 'Beta' },
+  { icon: CheckSquare, color: '#3B82F6', bg: '#EFF6FF', title: 'Auto Grader',               desc: 'Upload student submissions and let AI grade them automatically',    href: '/toolkit/auto-grader',       tag: 'New' },
+  { icon: Star,        color: '#8B5CF6', bg: '#F5F3FF', title: 'Rubric Builder',             desc: 'Create detailed marking rubrics for fair and consistent grading',   href: '/toolkit/rubric-builder',       tag: 'New' },
+  { icon: BarChart2,   color: '#10B981', bg: '#ECFDF5', title: 'Analytics Dashboard',        desc: 'Track student performance trends across assignments and subjects',   href: '/toolkit/analytics',       tag: 'New' },
+  { icon: PenTool,     color: '#F59E0B', bg: '#FFFBEB', title: 'Feedback Generator',         desc: 'Generate personalised AI feedback for each student response',        href: '/toolkit/feedback-generator',       tag: 'New' },
+  { icon: Zap,         color: '#EC4899', bg: '#FDF2F8', title: 'Quick Quiz Creator',         desc: 'Build quick 5-question formative assessments in under 30 seconds',  href: '/toolkit/quick-quiz',       tag: 'Beta' },
 ];
 
 export default function ToolkitPage() {

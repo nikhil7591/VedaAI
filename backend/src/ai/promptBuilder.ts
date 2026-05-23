@@ -19,6 +19,7 @@ CRITICAL RULES:
 8. For MCQ questions, always provide exactly 4 options.
 9. The "options" field is ONLY required for MCQ questions. Omit it for other types.
 10. ALWAYS include an "answer" field for every question — for MCQ include the correct option text, for others a brief model answer (1-2 sentences).
+11. Respect the teacher's per-section question plan exactly: generate the requested number of questions for each type and keep the marks per question as specified.
 
 REQUIRED JSON SCHEMA:
 {
@@ -57,10 +58,14 @@ export class PromptBuilder {
 
 PAPER DETAILS:
 - Title: "${assignment.title}"
+- Class: ${assignment.className}
 - Subject: ${assignment.subject}
 - Total Questions: ${total}
 - Total Marks: ${assignment.totalMarks}
 - Marks per question (approximate): ${marksPerQuestion}
+
+QUESTION PLAN:
+${assignment.questionPlan.map((item) => `- ${item.type}: ${item.questions} questions, ${item.marks} marks each (section total ${item.questions * item.marks} marks)`).join('\n')}
 
 QUESTION TYPES TO INCLUDE:
 ${assignment.questionTypes.map((t) => `- ${t}`).join('\n')}

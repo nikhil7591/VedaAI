@@ -10,11 +10,13 @@ interface AssignmentState extends AssignmentFormData {
 
 const defaultValues: AssignmentFormData = {
   title:                  '',
+  className:              '',
   subject:                '',
   dueDate:                '',
   totalMarks:             100,
   totalQuestions:         20,
   questionTypes:          ['MCQ'],
+  questionPlan:           [{ type: 'MCQ', questions: 20, marks: 5 }],
   difficultyDistribution: { easy: 40, medium: 40, hard: 20 },
   additionalInstructions: '',
 };

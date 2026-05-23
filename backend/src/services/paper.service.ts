@@ -6,6 +6,7 @@ import { logger } from '../utils/logger';
 export interface CreatePaperDTO {
   assignmentId: string;
   title: string;
+  className: string;
   subject: string;
   dueDate?: Date;
   totalMarks: number;

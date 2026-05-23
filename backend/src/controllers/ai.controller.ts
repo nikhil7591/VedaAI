@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
+import multer from 'multer';
 import Groq from 'groq-sdk';
 import { env } from '../config/env';
 import { asyncHandler } from '../utils/asyncHandler';
@@ -11,6 +12,20 @@ const getGroq = () => {
   return groq;
 };
 
+export const imageUpload = multer({
+  storage: multer.memoryStorage(),
+  limits: {
+    fileSize: 5 * 1024 * 1024,
+  },
+  fileFilter: (_req, file, cb) => {
+    if (!file.mimetype.startsWith('image/')) {
+      cb(new Error('Only image files are supported for extraction'));
+      return;
+    }
+    cb(null, true);
+  },
+});
+
 async function callGroq(system: string, user: string): Promise<string> {
   const res = await getGroq().chat.completions.create({
     model:           env.LLM_MODEL,
@@ -21,6 +36,75 @@ async function callGroq(system: string, user: string): Promise<string> {
   });
   return res.choices[0]?.message?.content ?? '{}';
 }
+
+export const extractTextFromImage = asyncHandler(async (req: Request, res: Response) => {
+  const file = req.file as Express.Multer.File | undefined;
+
+  if (!file) {
+    res.status(400).json({
+      success: false,
+      error: {
+        code: 'FILE_REQUIRED',
+        message: 'Please upload an image file',
+      },
+    });
+    return;
+  }
+
+  const dataUrl = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+
+  const completion = await getGroq().chat.completions.create({
+    model: 'meta-llama/llama-4-scout-17b-16e-instruct',
+    messages: [
+      {
+        role: 'system',
+        content:
+          'You extract text from assignment images. Return only valid JSON with keys text and summary. Preserve line breaks where helpful.',
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'text',
+            text: 'Extract all readable text from this assignment image. Return JSON only in the format {"text":"...","summary":"..."}.',
+          },
+          {
+            type: 'image_url',
+            image_url: { url: dataUrl },
+          },
+        ],
+      },
+    ],
+    response_format: { type: 'json_object' },
+    temperature: 0,
+    max_tokens: 2048,
+  });
+
+  const raw = completion.choices[0]?.message?.content ?? '{}';
+  let parsed: { text?: string; summary?: string } = {};
+
+  try {
+    parsed = JSON.parse(raw) as { text?: string; summary?: string };
+  } catch (error) {
+    logger.error('Failed to parse Groq extraction response', error);
+    res.status(502).json({
+      success: false,
+      error: {
+        code: 'EXTRACTION_PARSE_ERROR',
+        message: 'Failed to parse extracted content',
+      },
+    });
+    return;
+  }
+
+  res.json({
+    success: true,
+    data: {
+      text: parsed.text ?? '',
+      summary: parsed.summary ?? '',
+    },
+  });
+});
 
 // ─── 1. Auto Grader ──────────────────────────────────────────────────────────
 

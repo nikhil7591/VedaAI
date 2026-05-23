@@ -50,12 +50,17 @@ export function AssignmentCard({
     <div className="card flex flex-col gap-3 p-5 rounded-3xl bg-white shadow-sm border border-gray-100 transition-shadow hover:shadow-md">
       {/* Title row */}
       <div className="flex items-start justify-between gap-2">
-        <h3
-          className="flex-1 cursor-pointer text-base font-bold leading-snug text-gray-900 hover:text-[#E5442D] transition-colors"
+        <div 
+          className="flex-1 cursor-pointer group"
           onClick={() => router.push(viewHref)}
         >
-          {a.title}
-        </h3>
+          <h3 className="text-lg font-black tracking-tight leading-snug text-gray-900 group-hover:text-[#E5442D] transition-colors">
+            {a.title}
+          </h3>
+          <p className="mt-0.5 text-sm font-medium text-gray-500">
+            {a.subject}
+          </p>
+        </div>
 
         {/* 3-dot menu */}
         <div className="relative flex-shrink-0" ref={menuRef}>
@@ -89,9 +94,8 @@ export function AssignmentCard({
       </div>
 
       {/* Dates line - Exact match to Figma */}
-      <div className="mt-2 text-[13px] font-bold text-gray-800 flex items-center gap-2">
+      <div className="mt-4 flex items-center justify-between text-[12px] font-bold text-gray-800">
         <span>Assigned on : {fmt(a.createdAt)}</span>
-        <span className="text-gray-300 font-normal">|</span>
         <span>Due : {a.dueDate ? fmt(a.dueDate) : 'N/A'}</span>
       </div>
 

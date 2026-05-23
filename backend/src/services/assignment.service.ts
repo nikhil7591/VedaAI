@@ -4,11 +4,13 @@ import { logger } from '../utils/logger';
 
 export interface CreateAssignmentDTO {
   title: string;
+  className: string;
   subject: string;
   dueDate: string;
   totalMarks: number;
   totalQuestions: number;
   questionTypes: string[];
+  questionPlan: { type: string; questions: number; marks: number }[];
   difficultyDistribution: { easy: number; medium: number; hard: number };
   additionalInstructions?: string;
   groupId?: string;

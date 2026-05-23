@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   Loader2, AlertCircle, RefreshCw,
@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { AppShell } from '../../../../components/layout/AppShell';
-import { PaperAPI } from '../../../../lib/api';
+import { PaperAPI, ProfileAPI } from '../../../../lib/api';
 import { usePaperStore } from '../../../../stores/paperStore';
 import { QuestionPaper } from '../../../../components/paper/QuestionPaper';
 
@@ -16,7 +16,13 @@ export default function PaperPage() {
   const { id: assignmentId } = useParams<{ id: string }>();
   const router = useRouter();
   const { paper, isLoading, error, setPaper, setLoading, setError } = usePaperStore();
+  const [profile, setProfile] = useState<{name: string, address: string} | null>(null);
 
+  useEffect(() => {
+    ProfileAPI.get().then(p => {
+      if (p) setProfile({ name: p.name, address: p.address });
+    }).catch(console.error);
+  }, []);
   useEffect(() => {
     if (!assignmentId) return;
     if (paper?.assignmentId === assignmentId) return;
@@ -71,21 +77,15 @@ export default function PaperPage() {
       <div className="p-4 md:p-6 print:p-0">
 
         {/* ── AI Banner — dark background matching design ── */}
-        <div className="no-print mb-4 flex items-center justify-between gap-4 rounded-2xl bg-[#1A1A2E] px-5 py-4 text-white shadow-sm">
-          <div className="flex items-start gap-3">
-            <Sparkles className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#E5442D]" />
-            <p className="text-sm leading-relaxed text-gray-200">
-              <span className="font-semibold text-white">Certainly!</span>{' '}
-              Here is your customized Question Paper for{' '}
-              <span className="font-semibold text-white">{paper.subject}</span>{' '}
-              — {paper.title}. Generated using Groq AI.
-            </p>
-          </div>
+        <div className="no-print mb-4 rounded-[24px] bg-[#222222] p-6 shadow-sm">
+          <p className="text-[15px] font-bold leading-relaxed text-white">
+            {`Certainly! Here is your customized Question Paper for your ${paper.subject} classes on ${paper.title}:`}
+          </p>
           <button
             onClick={() => window.print()}
-            className="flex flex-shrink-0 items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-2 text-xs font-semibold text-white hover:bg-white/20 transition-colors"
+            className="mt-4 flex w-fit items-center gap-2 rounded-full bg-white px-5 py-2.5 text-sm font-bold text-gray-900 shadow-sm transition-transform hover:scale-105 active:scale-95"
           >
-            <Download className="h-3.5 w-3.5" />
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
             Download as PDF
           </button>
         </div>
@@ -115,7 +115,7 @@ export default function PaperPage() {
         </div>
 
         {/* ── Paper ── */}
-        <QuestionPaper paper={paper} />
+        <QuestionPaper paper={paper} profileName={profile?.name} />
       </div>
     </AppShell>
   );

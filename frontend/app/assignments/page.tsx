@@ -94,34 +94,37 @@ export default function AssignmentsPage() {
         /* ── List ── */
         <div className="px-5 py-6 md:p-8 pb-32">
           {/* Header */}
-          <div className="flex items-center gap-4 mb-6">
-            <Link href="/" className="flex h-10 w-10 items-center justify-center rounded-full bg-white shadow-sm border border-gray-100 hover:bg-gray-50 transition-colors">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-gray-800"><path d="m15 18-6-6 6-6"/></svg>
-            </Link>
-            <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Assignments</h1>
+          <div className="mb-6">
+            <div className="flex items-center gap-2 mb-1">
+              <div className="h-2.5 w-2.5 rounded-full bg-green-500"></div>
+              <h1 className="text-[22px] font-bold text-gray-900 tracking-tight">Assignments</h1>
+            </div>
+            <p className="text-sm text-gray-500 font-medium ml-4">
+              Manage and create assignments for your classes.
+            </p>
           </div>
 
           {/* Filter + Search (Single Row) */}
-          <div className="flex gap-3 mb-6">
-            <button className="flex items-center gap-2 rounded-full bg-white px-5 py-3 shadow-sm border border-gray-100 text-sm text-gray-600 font-bold whitespace-nowrap hover:bg-gray-50 transition-colors">
+          <div className="flex items-center gap-3 mb-6 bg-white rounded-full p-1 border border-gray-100 shadow-sm">
+            <div className="flex items-center gap-2 px-4 py-2 border-r border-gray-100 text-sm text-gray-500 font-medium whitespace-nowrap">
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
-              Filter
-            </button>
-            <div className="relative flex-1">
-              <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+              Filter By
+            </div>
+            <div className="relative flex-1 flex items-center">
+              <Search className="h-4 w-4 text-gray-400 ml-2 mr-2" />
               <input
                 type="text"
-                placeholder="Search Name"
+                placeholder="Search Assignment"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full rounded-full bg-white py-3 pl-12 pr-4 shadow-sm border border-gray-100 text-sm font-medium outline-none placeholder:text-gray-400 focus:ring-2 focus:ring-[#E5442D]/20"
+                className="w-full bg-transparent py-2 pr-4 text-sm font-medium outline-none placeholder:text-gray-400"
               />
             </div>
           </div>
 
           {/* Grid */}
           {filtered.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2">
               {filtered.map((a) => (
                 <AssignmentCard key={a._id} a={a} onDelete={handleDelete} />
               ))}
@@ -132,14 +135,16 @@ export default function AssignmentsPage() {
             </div>
           )}
 
-          {/* Mobile FAB (White with Orange Plus) */}
-          <Link
-            href="/create"
-            aria-label="Create assignment"
-            className="fixed bottom-[90px] right-5 flex h-14 w-14 items-center justify-center rounded-full bg-white text-[#E5442D] shadow-[0_4px_20px_rgba(0,0,0,0.15)] md:hidden z-40 transition-transform active:scale-95"
-          >
-            <Plus className="h-7 w-7" strokeWidth={3} />
-          </Link>
+          {/* Floating Action Button (Center Bottom) */}
+          <div className="fixed bottom-6 left-0 right-0 md:left-[252px] flex justify-center z-40 pointer-events-none">
+            <Link
+              href="/create"
+              className="flex items-center gap-2 rounded-full bg-[#1A1A1A] px-6 py-3.5 text-sm font-bold text-white shadow-lg pointer-events-auto transition-transform hover:scale-[1.02] active:scale-95"
+            >
+              <Plus className="h-5 w-5" strokeWidth={2.5} />
+              Create Assignment
+            </Link>
+          </div>
         </div>
       )}
     </AppShell>

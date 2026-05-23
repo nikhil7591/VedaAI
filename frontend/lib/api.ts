@@ -67,6 +67,133 @@ export const AssignmentAPI = {
   },
 };
 
+export const AIAPI = {
+  extractTextFromImage: async (file: File): Promise<{ text: string; summary: string }> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const res = await api.post<ApiSuccess<{ text: string; summary: string }>>('/ai/extract-text', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+
+    return res.data.data;
+  },
+
+  gradeSubmission: async (data: {
+    questionText: string;
+    studentAnswer: string;
+    maxMarks: number;
+    subject: string;
+    gradeLevel?: string;
+    correctAnswer?: string;
+  }) => {
+    const res = await api.post<ApiSuccess<{
+      score: number;
+      maxMarks: number;
+      percentage: number;
+      grade: string;
+      feedback: string;
+      strengths: string[];
+      improvements: string[];
+      detailedBreakdown: string;
+    }>>('/ai/grade', data);
+    return res.data.data;
+  },
+
+  buildRubric: async (data: {
+    subject: string;
+    topic: string;
+    totalMarks: number;
+    criteria?: number;
+    gradeLevel?: string;
+    taskType?: string;
+  }) => {
+    const res = await api.post<ApiSuccess<{
+      title: string;
+      subject: string;
+      topic: string;
+      taskType: string;
+      totalMarks: number;
+      criteria: {
+        name: string;
+        description: string;
+        maxMarks: number;
+        levels: { label: string; marks: number; description: string }[];
+      }[];
+    }>>('/ai/rubric', data);
+    return res.data.data;
+  },
+
+  generateFeedback: async (data: {
+    studentName?: string;
+    subject: string;
+    topic: string;
+    studentAnswer: string;
+    questionText?: string;
+    marks?: number;
+    tone?: 'Encouraging' | 'Neutral' | 'Strict';
+  }) => {
+    const res = await api.post<ApiSuccess<{
+      studentName: string;
+      subject: string;
+      overallComment: string;
+      strengths: string[];
+      areasToImprove: string[];
+      actionPlan: string[];
+      motivationalClose: string;
+    }>>('/ai/feedback', data);
+    return res.data.data;
+  },
+
+  createQuiz: async (data: {
+    topic: string;
+    subject: string;
+    gradeLevel?: string;
+    count?: number;
+    type?: 'MCQ' | 'True/False' | 'Mixed';
+    difficulty?: 'Easy' | 'Medium' | 'Hard' | 'Mixed';
+  }) => {
+    const res = await api.post<ApiSuccess<{
+      title: string;
+      subject: string;
+      topic: string;
+      gradeLevel: string;
+      estimatedMinutes: number;
+      questions: {
+        number: number;
+        text: string;
+        type: string;
+        difficulty: string;
+        options: string[];
+        correctAnswer: string;
+        explanation: string;
+      }[];
+    }>>('/ai/quiz', data);
+    return res.data.data;
+  },
+};
+
+// ─── Analytics API ────────────────────────────────────────────────────────────
+
+export const AnalyticsAPI = {
+  getDashboard: async () => {
+    const res = await api.get<ApiSuccess<{
+      total: number;
+      completed: number;
+      processing: number;
+      pending: number;
+      failed: number;
+      successRate: number;
+      bySubject: { subject: string; count: number }[];
+      overTime: { date: string; count: number }[];
+      avgMarksBySubject: { subject: string; avgMarks: number; count: number }[];
+      questionTypeStats: { type: string; count: number }[];
+      insights: string[];
+    }>>('/analytics/dashboard');
+    return res.data.data;
+  },
+};
+
 // ─── Paper API ────────────────────────────────────────────────────────────────
 
 export const PaperAPI = {
